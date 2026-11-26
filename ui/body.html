@@ -1,0 +1,59 @@
+<!-- reTerminal frame: core page. Plugin tabs are inserted at the marker below by tools/build_ui.py.
+     Tabs: <section class="tab" data-tab="key" data-title="Title">; the nav is built from them (device.js). -->
+<main>
+<header><div><h1 id="name">Frame</h1><div class="mut" id="sub"></div></div>
+<div class="hright"><span id="pAwake" class="pill" title="How long the frame stays on Wi-Fi before it sleeps">…</span><span id="link" class="pill" title="Wi-Fi">…</span><span id="pBat" class="pill" title="Battery">…</span><span class="pill warn" id="upd" style="display:none;cursor:pointer" onclick="location.reload()" title="The frame runs a different firmware build than this page">New version: reload</span>
+<button class="hbtn" id="night" title="Red night mode">🌙</button></div></header>
+
+<nav class="tabs" id="tabs" role="tablist"></nav>
+
+<section class="tab" data-tab="overview" data-title="Overview">
+<div class="grid" id="tiles"></div>
+
+<section class="card"><h2>Screen</h2>
+<div class="bar"><button id="bPrev" title="Show the previous item of the source below">◀ Previous</button><button id="bNext" title="Show the next item">Next ▶</button><button id="bRand" title="Show a random item">Random</button><span class="sp"></span>
+<span class="pill" id="pRef" style="visibility:hidden">Refreshing…</span></div>
+<p class="msg" id="showMsg" aria-live="polite">A full colour refresh takes about 15–45 s; the panel flashes while it changes.</p></section>
+
+<section class="card"><h2>Schedule and power</h2>
+<form class="ctl" id="sched">
+<label title="Which plugin the schedule and the buttons show">Show <select name="source" id="srcSel"></select></label>
+<label title="Changes to the next item this often, also while asleep">Change every <span class="nu"><input name="interval_min" type="number" min="1" max="10080" step="1"><i class="u">min</i></span></label>
+<label title="After power-on, or a button held for 2 s, the frame stays on Wi-Fi this long. Using this page adds time (at least 5 min after the last request). Then it sleeps until the next change or a button press.">Stay on Wi-Fi <span class="nu"><input name="awake_min" type="number" min="1" max="1440" step="1"><i class="u">min</i></span></label>
+<label title="Auto: stays on Wi-Fi while USB power is connected, sleeps on battery. Always: never sleeps (on battery that empties it in about a day). Sleep: sleeps on schedule even on USB.">Stay awake <select name="always_on"><option value="2">Auto: while on USB power</option><option value="1">Always</option><option value="0">No: sleep on schedule</option></select></label>
+<label title="How the frame hangs. New photos are prepared for this; photos already on the frame keep the orientation they were made for.">Hung <select name="rotation"><option value="0">Portrait</option><option value="1">Landscape</option><option value="2">Portrait, upside down</option><option value="3">Landscape, upside down</option></select></label>
+<div class="bar" style="margin-top:8px"><button id="schedApply" disabled>Apply</button><button type="button" class="d" id="schedUndo" style="visibility:hidden">Undo</button><span class="sp"></span>
+<button type="button" class="d" id="bSleep" title="Sleep now instead of waiting for the Wi-Fi time to run out. Hold any button for 2 s to wake it with Wi-Fi again.">Sleep now</button></div>
+<p class="msg" id="schedMsg" aria-live="polite"></p></form>
+<p class="note" style="margin:0">Buttons: right = next, left = previous, refresh = random. Hold one for 2 s to wake the frame with Wi-Fi.</p></section>
+</section>
+
+@@PLUGIN_TABS@@
+
+<section class="tab" data-tab="setup" data-title="Setup">
+<details class="card" id="d-wifi" open><summary>WiFi network</summary>
+<p id="wifiNow" style="margin:0 0 6px"></p>
+<div class="bar"><button type="button" id="scanb">Scan networks</button><span class="mut" id="scanst"></span></div>
+<form method="post" action="/wifi" id="wf">
+<label>Network <select id="nets" style="max-width:62vw"><option value="">(scan, or type the name below)</option></select></label>
+<label>SSID <input name="ssid" required maxlength="32" autocapitalize="off" autocorrect="off"></label>
+<label>Password <input name="pass" type="password" maxlength="63" placeholder="empty = open network"></label>
+<button>Join and restart</button></form>
+<p class="mut" id="wifiNote" style="font-size:12px;margin-bottom:0">If the frame can't join, it opens its own hotspot again so you can fix this.</p></details>
+
+<details class="card" id="d-settings"><summary>Settings</summary>
+<form class="ctl" id="sf">
+<label title="Its address on your network: http://NAME.local/ (letters, digits and -)">Name <input name="host" maxlength="24" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+<label title="Login for changes (user admin). Leave empty to keep it as it is.">New password <input name="newpass" type="password" maxlength="63" autocomplete="new-password" placeholder="unchanged"></label>
+<div class="crow pref"><label for="noPass">Remove the password (anyone on the network can change things)</label><input type="checkbox" id="noPass"></div>
+<div class="bar" style="margin-top:8px"><button id="sfApply">Save</button></div>
+<p class="msg" id="sfMsg" aria-live="polite"></p></form></details>
+
+<details class="card" id="d-fw"><summary>Firmware update</summary>
+<p class="note" style="margin:0 0 8px">Upload <code>firmware.bin</code> (from <code>pio run</code>: <code>.pio/build/reterminal_e1004/</code>). The frame restarts with it.</p>
+<div class="bar"><input type="file" id="fwFile" accept=".bin" style="max-width:none;flex:1"><button id="fwGo" disabled>Upload</button></div>
+<p class="msg" id="fwMsg" aria-live="polite"></p></details>
+
+<details class="card" id="d-diag"><summary>Diagnostics</summary><pre id="diag"></pre></details>
+</section>
+</main>

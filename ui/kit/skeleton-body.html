@@ -1,0 +1,35 @@
+<!-- Standard page body. Copy to ui/body.html and fill in; keep the order and ids.
+     1 header  2 tiles (or a .rd readings card, v3)  3 chart card  4 primary cards (<section class="card">)  5 secondary cards (<details class="card">) -->
+<main>
+<div class="pinwrap" id="pinwrap" aria-hidden="true"><div class="pinbar" id="pinbar"></div></div>
+<header><div><h1 id="name">Device name</h1><div class="mut" id="sub"></div></div>
+<div class="hright"><span id="link" class="pill">…</span><span class="pill warn" id="upd" style="display:none;cursor:pointer" onclick="location.reload()" title="The device runs a different firmware build than this page">New version: reload</span>
+<button class="hbtn" id="night" title="Red night mode (keeps dark adaptation)">🌙</button></div></header>
+
+<div class="grid" id="tiles"></div>
+
+<section class="card"><div class="bar"><span class="seg" id="ranges"></span><select id="panel"></select><span class="sp"></span>
+<button id="zr" style="display:none">Reset zoom</button><button id="brng" class="rng" style="display:none">Range: auto</button><button id="bpng">PNG</button><button id="bcsv">CSV</button></div>
+<div class="cw"><canvas id="ch"></canvas><div class="tip" id="tip"></div></div>
+<div class="lg" id="cust" style="display:none;margin:6px 0 0"></div><div class="lg" id="lg"></div><div class="mut" id="chNote" style="font-size:12px;margin-top:4px"></div></section>
+
+<!-- primary cards for this device go here -->
+
+<details class="card" id="d-console"><summary>Console</summary>
+<div class="bar"><input id="cmd" style="flex:1;max-width:none" autocomplete="off" aria-label="Command"><button id="cmdb">Send</button></div><pre id="cmdout" aria-live="polite"></pre></details>
+
+<details class="card" id="d-wifi"><summary>WiFi network</summary>
+<p id="wifiNow" style="margin:0 0 6px"></p>
+<div class="bar"><button type="button" id="scanb">Scan networks</button><span class="mut" id="scanst"></span></div>
+<form method="post" action="/wifi" id="wf">
+<label>Network <select id="nets" style="max-width:62vw"><option value="">(scan, or type the name below)</option></select></label>
+<label>SSID <input name="ssid" required maxlength="32" autocapitalize="off" autocorrect="off"></label>
+<label>Password <input name="pass" type="password" maxlength="63" placeholder="empty = open network"></label>
+<button>Join and restart</button></form>
+<p class="mut" id="wifiNote" style="font-size:12px;margin-bottom:0"></p></details>
+
+<details class="card" id="d-settings"><summary>Settings</summary>
+<form method="post" action="/settings" id="sf">
+<!-- <label>Setting name <input name="key"></label> -->
+<button>Save settings</button></form></details>
+</main>

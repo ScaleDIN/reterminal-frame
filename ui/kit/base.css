@@ -1,0 +1,183 @@
+/* device-web-ui kit v8: house style of the EBC-A20 bridge and PocketCW pages, merged.
+   Tokens first. A project may override --acc (its accent) and nothing else. */
+:root{--bg:#f5f6f8;--card:#fff;--fg:#1d2330;--mut:#667085;--line:#e3e6eb;--grid:#eceff3;
+--ok:#1a7f37;--bad:#c62828;--warn:#9a6700;--unk:#9a6700;--acc:#1f6feb;
+--c1:#1f6feb;--c2:#8250df;--c3:#bc4c00;--c4:#0a7e8c;--c5:#1a7f37;--c6:#9a6700;--c7:#bf3989;--c8:#6e5849;--c9:#0969da;--c10:#cf222e;
+--shade:rgba(209,36,47,.08);--sel:rgba(31,111,235,.14);--bgi:rgba(110,118,129,.09);--bgc:rgba(26,127,55,.08);--bgd:rgba(209,36,47,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1218;--card:#181c24;--fg:#e6e9ef;--mut:#98a2b3;--line:#2a303b;--grid:#21262d;
+--ok:#3fb950;--bad:#f85149;--warn:#d29922;--unk:#d29922;--acc:#58a6ff;
+--c1:#58a6ff;--c2:#bc8cff;--c3:#ffa657;--c4:#39c5cf;--c5:#3fb950;--c6:#d29922;--c7:#f778ba;--c8:#c9a27e;--c9:#79c0ff;--c10:#ff7b72;
+--shade:rgba(255,123,114,.10);--sel:rgba(88,166,255,.18);--bgi:rgba(139,148,158,.10);--bgc:rgba(63,185,80,.10);--bgd:rgba(255,123,114,.08)}}
+/* Red night mode: keeps dark adaptation at the telescope (toggle: K.night). */
+:root[data-night]{--bg:#000;--card:#0b0000;--fg:#e03030;--mut:#9a2222;--line:#3a0808;--grid:#240404;--ok:#c02020;--bad:#ff4040;--warn:#a83030;--unk:#a83030;--acc:#5a0a0a;
+--c1:#ff3b3b;--c2:#c41e1e;--c3:#ff7a5c;--c4:#8f1414;--c5:#ff5f5f;--c6:#b03030;--c7:#ff9a8a;--c8:#7a1010;--c9:#e04848;--c10:#ffb0a0;
+--shade:rgba(255,40,40,.13);--sel:rgba(255,60,60,.2);--bgi:rgba(255,40,40,.06);--bgc:rgba(255,40,40,.08);--bgd:rgba(255,40,40,.1);--btn:#ff9090}
+:root[data-night] button{color:var(--btn)}:root[data-night] .badge,:root[data-night] .bd.chg,:root[data-night] .bd.dis{color:#000}
+:root[data-night] .hbtn{color:var(--fg)}:root[data-night] .tip,:root[data-night] .pinbar{box-shadow:none}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0}
+h2,summary{font-size:14px;margin:0;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+code{font:13px ui-monospace,monospace}
+
+/* header: name + subtitle on the left, badge / pills / header buttons on the right */
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+#sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:75vw}
+@media (max-width:600px){#sub{white-space:normal;max-width:none;min-height:2.8em}}  /* phones: wrap the status line, do not cut it; 2 lines reserved so its height never changes while scrolling (iOS) */
+.hright{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.badge{padding:6px 14px;border-radius:999px;font-weight:700;color:#fff;background:var(--mut)}.badge.ok,.safe{background:var(--ok)}.badge.bad,.unsafe{background:var(--bad)}.badge.warn{background:var(--warn)}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut);display:inline-block;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill.ok{color:var(--ok);border-color:var(--ok)}.pill.warn{color:var(--warn);border-color:var(--warn)}.pill.bad{color:var(--bad);border-color:var(--bad)}
+.hbtn{background:var(--bg);color:var(--fg);border:1px solid var(--line);margin:0;padding:4px 9px}
+.hbtn.on{background:var(--bad);color:#fff;border-color:var(--bad)}
+
+/* pinned bar: slides in (fixed, no layout shift) once the tiles scroll off screen */
+.pinwrap{position:fixed;top:0;left:0;right:0;z-index:10;padding:0 16px;pointer-events:none;transform:translateY(-110%);transition:transform .2s}
+.pinwrap.show{transform:none}
+.pinbar{max-width:968px;margin:0 auto;pointer-events:auto;background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;
+ box-shadow:0 2px 8px rgba(0,0,0,.18);padding:6px 12px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;font-size:13px}
+.pinbar b{font-weight:600}.pinbar .badge{padding:2px 10px;font-size:12px}
+
+/* reading tiles */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.tile .k{color:var(--mut);font-size:12px}.tile .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.tile .s{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* cards; secondary ones are <details class="card"> and remember open/closed */
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;overflow-x:auto;min-width:0}
+.card>h2{margin-bottom:8px}
+details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::before{content:'▸ '}details.card[open]>summary::before{content:'▾ '}details.card[open]>summary{margin-bottom:10px}
+
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+td,th{text-align:left;padding:4px 8px;border-bottom:1px solid var(--line);font-size:14px}th{color:var(--mut);font-weight:600}
+.tw{overflow-x:auto}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}.unk{color:var(--unk)}.mut{color:var(--mut)}
+.note{font-size:13px;color:var(--mut)}
+
+/* forms: one setting per row, label left, control right */
+form label{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--line)}
+input,select{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 6px;max-width:170px}
+input[type=checkbox]{width:18px;height:18px;margin:0}
+button{font:inherit;background:var(--acc);color:#fff;border:0;border-radius:6px;padding:6px 14px;margin-top:8px;cursor:pointer}
+button.d{background:transparent;color:var(--bad);border:1px solid var(--bad)}button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}.bar button{margin:0;padding:4px 10px}
+.seg button{background:var(--bg);color:var(--fg);border:1px solid var(--line)}.seg button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.sp{flex:1}
+button.rng{min-width:7.4em}  /* v13: the chart's Range button, as wide in every state so the bar never moves */
+#panel{flex:100 1 4.5em;min-width:0;max-width:max-content}  /* chart toolbar: the panel select is as wide as its longest name when there is room, and gives way before the row wraps, so "Reset zoom" appearing never moves the chart (v4) */
+pre{white-space:pre-wrap;word-break:break-all;font:12px/1.35 ui-monospace,monospace;background:var(--bg);border-radius:6px;padding:8px;margin:8px 0 0;min-height:1.4em}
+
+/* chart: base canvas + floating tooltip, legend chips below */
+.cw{position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+canvas{width:100%;height:320px;display:block;touch-action:pan-y;cursor:crosshair}
+@media (max-width:600px){canvas{height:260px}}
+.tip{position:absolute;top:0;left:0;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:12px;
+ box-shadow:0 2px 8px rgba(0,0,0,.15);display:none;white-space:nowrap;z-index:2;font-variant-numeric:tabular-nums;line-height:1.5}
+.tip i,.lg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.lg{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
+.lg label{display:inline-flex;align-items:center;gap:2px;cursor:pointer;color:var(--fg);padding:0;border:0}
+.lg input{margin:0 4px 0 0;width:auto;height:auto}
+/* v14: the chart's Custom picker (#cust): chips, grouped under foldable headers when the series have groups */
+.cpk{flex:1 1 100%;min-width:0}
+.cpk .cg{border-top:1px solid var(--line);padding:3px 0}
+.cpk .cgh{display:flex;align-items:center;gap:6px;min-height:24px;cursor:pointer;color:var(--fg);user-select:none}
+.cpk .cgh b{font-weight:600}.cpk .cn{color:var(--mut)}
+.cpk .chev{display:inline-block;width:1em;text-align:center;color:var(--mut);transition:transform .15s}
+.cpk .cg.shut .chev{transform:rotate(-90deg)}.cpk .cg.shut .cgv{display:none}
+.cpk .cgv,.cpk .cflat{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 3px 1.6em}.cpk .cflat{margin:0}
+.cpk button{font:inherit;font-size:12px;margin:0;line-height:1.4}
+.cpk .chip{padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--mut)}
+.cpk .chip i{width:8px;height:8px;margin-right:5px;border:1px solid var(--line)}
+.cpk .chip.on{color:var(--fg);border-color:var(--acc);background:var(--sel)}.cpk .chip.on i{border-color:transparent}
+.cpk .cnone,.cpk .call{padding:1px 9px;margin-left:auto}
+.cpk .cgh b,.cpk .cn,.cpk .cnone{white-space:nowrap;flex:none}
+.cpk .clit{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;color:var(--fg)}  /* v15 */
+.cpk .clit i{margin:0 4px 0 6px}
+.cpk .cft{display:flex;border-top:1px solid var(--line);padding-top:4px}
+:root[data-night] .cpk .chip{color:var(--mut)}:root[data-night] .cpk .chip.on{color:var(--fg)}
+
+/* ---- v3 (all opt-in by class; v2 pages look the same) */
+/* Pill header (EBC-A20): full width above <main>, centred, fixed-width pills that read like a status strip.
+   <header class="ph"><h1>…</h1><span class="pill">…</span>…<button class="hbtn" id="night">🌙</button></header> */
+header.ph{justify-content:center;gap:10px;margin:0;padding:12px 16px;border-bottom:1px solid var(--line)}
+header.ph h1{font-size:17px}
+header.ph .pill{width:15.5em;text-align:center;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:720px){header.ph h1{flex-basis:100%;text-align:center}header.ph .pill{width:calc(50% - 5px);max-width:15.5em}}
+
+/* Two columns from 1000 px (<main class="cols">): the main cards on the left, each in a row of its own, and
+   <div id="side"> on the right, sticky and scrolling on its own. Rows: --rows main cards (default 4), then one
+   1fr row that takes the side column's extra height, so a longer side card never moves the cards on the left.
+   Below 1000 px everything stacks in source order. */
+main.cols{display:grid;gap:16px;max-width:1100px}
+main.cols .card{margin-bottom:0}
+#side{display:grid;gap:16px;min-width:0}
+@media (max-width:999px){main.cols{gap:12px;padding:12px}}
+@media (min-width:1000px){
+ main.cols{max-width:1600px;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:repeat(var(--rows,4),auto) 1fr;align-items:start}
+ main.cols>:not(#side){grid-column:1}
+ main.cols>#side{grid-column:2;grid-row:1/-1;position:sticky;top:12px;max-height:calc(100vh - 84px);overflow:auto;padding-right:2px}
+ main.cols .pinwrap{max-width:1600px;margin:0 auto}main.cols .pinbar{max-width:none;margin:0 416px 0 0}  /* v8: over the left column, not the side one */
+ /* v11: "cols top": the page's <header> (inside <main>) spans both columns and the side column starts under it, beside
+    the first card. The header counts as one of the --rows. :not(#side) outranks the column-1 rule above. */
+ main.cols.top>header:not(#side){grid-column:1/-1}main.cols.top>#side{grid-row:2/-1}
+}
+
+/* Readings card that shrinks to a sticky mini bar (K.miniCard / K.init({mini:id})), the alternative to the pinned
+   bar: <section class="card rd" id="rd"> with a .mg grid of .m readings (.k key, .v value). Only the .mm
+   readings stay in the mini bar; keys and .note lines go. */
+.rd{position:sticky;top:0;z-index:4}
+.rd.mini{box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.mg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.m{min-width:0}.m .k{font-size:12px;color:var(--mut)}.m .v{font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rd.mini .m:not(.mm),.rd.mini .m .k,.rd.mini .note{display:none}
+.rd.mini .mg{grid-template-columns:repeat(4,minmax(0,1fr))!important}.rd.mini .m .v{font-size:16px!important}
+@media (min-width:1000px){.mg{grid-template-columns:repeat(var(--mcols,8),minmax(0,1fr))}.m .v{font-size:20px}main.cols .rd{padding:10px 14px}.rd .note{margin:6px 0 0}}
+:root[data-night] .rd.mini{box-shadow:none}
+
+/* ---- v5: control cards (all opt-in by class; v4 pages look the same). From the WBPlus stock Alpaca page.
+   <form class="ctl"> puts every setting in one column with a shared left edge: label left, control right, each
+   control the same width and height. Wrap a number in <span class="nu"><input type="number"><i class="u">V</i></span>
+   so the unit sits inside the box. An On/Off pair is <div class="crow"><span>DC2</span><span class="seg"><button>On
+   </button><button>Off</button></span></div>. K.edits marks edited fields (accent border). */
+.ctl label,.ctl .crow{display:grid;grid-template-columns:minmax(0,1fr) minmax(10.5em,1fr);align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--line)}
+.ctl label>:last-child,.ctl .crow>:last-child{width:100%;max-width:none}
+.ctl .nu,.ctl select,.ctl .seg button{height:30px}
+.ctl .nu{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;background:var(--bg);white-space:nowrap}
+.ctl .nu input{border:0;background:transparent;flex:1;min-width:0;max-width:none;text-align:right;padding-right:4px}
+.ctl .nu input:focus-visible{outline:0}.ctl .nu:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+/* v6: the browser's spinner is hidden; K.stepper adds .st (two arrows) after the input with a fixed 8px gap */
+.ctl .nu input{-moz-appearance:textfield;appearance:textfield}
+.ctl .nu input::-webkit-inner-spin-button,.ctl .nu input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.ctl .nu .st{display:flex;flex-direction:column;align-self:stretch;margin-left:8px;flex:none}
+.ctl .nu .st button{flex:1;width:16px;min-width:0;height:auto;padding:0;margin:0;border:0;border-radius:0;background:var(--mut);cursor:pointer;-webkit-mask:var(--ar) center var(--ay)/9px 6px no-repeat;mask:var(--ar) center var(--ay)/9px 6px no-repeat}  /* arrows in the unit colour, every theme */
+.ctl .nu .st button:hover{background:var(--fg)}
+.ctl .nu .st [data-d="1"]{--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 5 4.5 1.5 8 5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");--ay:75%}
+.ctl .nu .st [data-d="-1"]{--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1 4.5 4.5 8 1' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");--ay:25%}
+.ctl .nu:has(input:disabled) .st button{cursor:default;background:var(--mut)}
+.ctl .nu:has(input:disabled){opacity:.6}
+.ctl [data-edited],.ctl .nu:has([data-edited]){border-color:var(--acc)}
+.u{font-style:normal;color:var(--mut);padding:0 8px 0 2px;min-width:2.6em;text-align:left;font-size:14px}
+.ctl .seg{display:flex}.ctl .seg button{flex:1;margin:0;padding:4px 14px;border-radius:0}
+.ctl .seg button:first-child{border-radius:6px 0 0 6px}.ctl .seg button:last-child{border-radius:0 6px 6px 0}
+.ctl .bar button:not(.d){border:1px solid transparent}  /* the primary button as tall as the outlined one beside it */
+/* A per-browser preference inside a control card (e.g. "Ask before switching off"): a checkbox row, never locked.
+   <div class="crow pref"><label for="x">…</label><input type="checkbox" id="x"></div> */
+.ctl .pref{border-bottom:0}.ctl .pref label{display:block;border:0;padding:0;cursor:pointer}.ctl .pref>input[type=checkbox]{width:18px;height:18px;justify-self:start}
+/* Two groups side by side from 760 px (Power | Dew heater), stacked on phones:
+   <div class="cgrid"><div class="cgrp"><h3>Power</h3>…</div><div class="cgrp"><h3>…</h3>…</div></div> */
+.cgrid{display:grid;grid-template-columns:minmax(0,1fr);column-gap:36px}
+@media (min-width:760px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#side .cgrid{grid-template-columns:minmax(0,1fr)}  /* v7: the 400 px side column is too narrow for two groups */
+.cgrp h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:10px 0 2px}
+/* Lock row above locked controls: always shown and a fixed size, so the lock state changing or the button showing
+   never moves the controls. <div class="lock"><span>text</span><button type="button">Unlock</button></div>;
+   .on while locked; hide the button with visibility:hidden, never display:none. */
+.lock{display:grid;grid-template-columns:1fr 6.5em;align-items:center;gap:10px;padding:6px 10px;margin:0 0 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;line-height:1.35;min-height:5.3em}
+.lock.on{border-color:var(--warn)}.lock button{margin:0;padding:5px 0;width:100%}
+/* Result message under a form: two lines reserved, so a message never moves what is below. <p class="msg" aria-live="polite"> */
+.msg{min-height:2.8em;line-height:1.4;margin:6px 0 0;font-size:13px;color:var(--mut)}  /* exactly two lines (v7: 2.7em was 1 px short); keep messages to two lines at 375 px */

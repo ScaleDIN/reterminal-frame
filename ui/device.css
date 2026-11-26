@@ -1,0 +1,7 @@
+/* Tabs (Overview, one per plugin, Setup): one row that scrolls sideways on phones rather than wrapping. */
+.tabs{display:flex;gap:4px;overflow-x:auto;margin:0 0 14px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:none;color:var(--mut);border:0;border-bottom:2px solid transparent;border-radius:0;margin:0;padding:8px 12px;white-space:nowrap;font-weight:600}
+.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--acc)}
+.tabs .tc{color:var(--mut);font-weight:400;font-variant-numeric:tabular-nums}
+section.tab[hidden]{display:none}

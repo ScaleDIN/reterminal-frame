@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frame-mock",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["tools/build_ui.py", "--serve", "--port", "8765"],
+      "port": 8765
+    }
+  ]
+}
