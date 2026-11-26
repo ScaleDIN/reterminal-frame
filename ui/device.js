@@ -74,15 +74,40 @@ const App = (() => {
     s.plugins.forEach((p) => { const e = $('tc-' + p.key); if (e) e.textContent = p.count >= 0 ? ' ' + p.count : ''; });
     $('wifiNow').innerHTML = s.net.sta ? `Joined <b>${K.esc(s.net.ssid)}</b> (${s.net.rssi} dBm), ${K.esc(s.net.ip)}`
       : `Hotspot <b>${K.esc(s.net.ap_name)}</b> at ${K.esc(s.net.ip)}` + (s.net.ssid ? ` (could not join <b>${K.esc(s.net.ssid)}</b>)` : ': pick your network');
+    renderUpd(s);
     $('diag').textContent = JSON.stringify(s, null, 1);
   }
+
+  // ---------------------------------------------------------------- updates (Setup › Firmware)
+  function renderUpd(s) {
+    const u = s.upd, a = u.available, busy = ['checking', 'downloading', 'restarting'].includes(u.state);
+    $('fwVer').textContent = s.fw;
+    $('fwChecked').textContent = u.checked ? '· last looked ' + K.stampT(u.checked) : u.feed ? '· not looked for updates yet' : '· this build has no update address';
+    updEd.fill({ updates: u.mode });
+    $('updAv').classList.toggle('on', !!a);
+    $('updVer').textContent = a ? `Version ${a.version}${a.date ? ' (' + a.date + ')' : ''} · ${Math.round(a.size / 1024)} kB` : 'No newer version known.';
+    $('updNotes').textContent = a ? a.notes || '(no notes)' : '';
+    $('updInstall').disabled = !a || busy || !s.net.sta;
+    $('updCheck').disabled = busy || !u.feed || !s.net.sta;
+    const label = { checking: 'Looking…', downloading: 'Downloading ' + (u.progress == null ? '' : u.progress + ' %'), restarting: 'Restarting…', error: 'Failed' }[u.state];
+    K.pill('updState', label || 'Idle', u.state === 'error' ? 'bad' : busy ? 'warn' : '');
+    $('updState').style.visibility = label ? 'visible' : 'hidden';
+    if (u.msg && (busy || u.state === 'error' || updAsked)) $('updMsg').textContent = u.msg;
+    if (u.state === 'restarting') $('updMsg').textContent = 'Installed. The frame restarts; this page reloads when it is back.';
+    const p = $('pUpd');
+    p.textContent = a ? 'Update ' + a.version : '';
+    p.style.display = a ? '' : 'none';
+  }
+  let updEd, updAsked = false;
 
   let pollT = null, fails = 0;
   async function poll() {
     clearTimeout(pollT);
     try {
+      const was = st;
       st = await K.getJSON('/status.json', 5000);
       fails = 0;
+      if (was && was.fw !== st.fw) return location.reload();  // back with another firmware
       render(st);
       listeners.forEach((fn) => fn(st));
     } catch (e) {
@@ -122,6 +147,19 @@ const App = (() => {
     });
 
     K.wifiCard({ other: false });
+
+    updEd = K.edits($('updForm'), async (d) => {
+      if (!d) return;
+      const v = $('updForm').updates.value;
+      if (await act('/settings', { updates: v }, $('updMsg'), ['Off: the frame sends nothing.', 'Saved: it looks once a day while awake.', 'Saved: it installs new versions by itself.'][v])) updEd.clear();
+    });
+    $('updCheck').onclick = () => { updAsked = true; act('/updates/check', {}, $('updMsg'), 'Looking…'); };
+    $('updInstall').onclick = () => {
+      const a = st && st.upd.available;
+      if (!a || !confirm(`Install version ${a.version} and restart the frame? It takes about a minute; the picture stays.`)) return;
+      updAsked = true; act('/updates/install', {}, $('updMsg'), 'Downloading…');
+    };
+    $('pUpd').onclick = () => { showTab('setup'); $('d-fw').open = true; $('d-fw').scrollIntoView(); };
 
     $('fwFile').onchange = () => { $('fwGo').disabled = !$('fwFile').files.length; };
     $('fwGo').onclick = () => {

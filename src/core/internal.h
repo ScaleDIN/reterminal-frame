@@ -47,6 +47,12 @@ bool sleepRequested();
 void setAwakeUntil(uint32_t ms);
 uint32_t nextChangeS();
 extern const char* FW_VERSION;
+
+// update.cpp
+void updatesLoop();
+String updatesJson();
+void updatesRoutes(WebServer& s);
+bool updateAvailable();
 extern const char* FW_BUILD;
 
 }  // namespace core

@@ -5,3 +5,8 @@
 .tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--acc)}
 .tabs .tc{color:var(--mut);font-weight:400;font-variant-numeric:tabular-nums}
 section.tab[hidden]{display:none}
+/* Firmware card: the available-update box keeps its place (visibility), so nothing below moves when one appears. */
+.upd-av{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0 0;min-height:7.2em}
+.upd-av.on{border-color:var(--ok)}.upd-av:not(.on) #updInstall{visibility:hidden}.upd-av:not(.on) b{font-weight:400;color:var(--mut)}
+.upd-av pre{max-height:8em;overflow:auto;margin:6px 0 0;white-space:pre-wrap;word-break:normal}
+.fw-h{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:14px 0 4px}

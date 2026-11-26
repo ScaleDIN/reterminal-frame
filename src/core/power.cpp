@@ -33,6 +33,9 @@ int batteryPct(float v) {
 // Not yet checked on hardware: if the chip doesn't answer, everything reports "unknown" and Auto means "sleep".
 static constexpr uint8_t CHG_ADDR = 0x6B;
 static int readChargerStatus() {
+  static SemaphoreHandle_t m = xSemaphoreCreateMutex();
+  xSemaphoreTake(m, portMAX_DELAY);
+  struct Give { SemaphoreHandle_t m; ~Give() { xSemaphoreGive(m); } } give{m};
   static bool begun = false;
   if (!begun) {
     Wire.begin(19, 20, 100000);

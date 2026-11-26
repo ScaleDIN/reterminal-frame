@@ -139,6 +139,7 @@ static void handleStatus() {
        ",\"always_on\":" + String(s.always_on) + ",\"rotation\":" + String(s.rotation) +
        ",\"source\":" + js(s.source) + ",\"host\":" + js(s.host) +
        ",\"has_pass\":" + String(s.pass.length() ? "true" : "false") + "}";
+  j += ",\"upd\":" + updatesJson();
   j += ",\"plugins\":[";
   for (size_t i = 0; i < pluginCount(); ++i) {
     Plugin* p = plugin(i);
@@ -174,6 +175,7 @@ static void handleSettings() {
     else msg = "Name: letters, digits and '-', up to 24. ";
   }
   if (w.hasArg("newpass")) s.pass = w.arg("newpass");  // empty = no login
+  if (w.hasArg("updates")) s.updates = (uint8_t)constrain(w.arg("updates").toInt(), 0L, 2L);
   saveSettings();
   w.send(200, "application/json", "{\"ok\":true,\"msg\":" + js(msg + "Saved.") + "}");
 }
@@ -252,6 +254,7 @@ void startWeb() {
     g_awakeUntil = millis();
     g_sleepNow = true;  // also when "always on"
   });
+  updatesRoutes(w);
   for (size_t i = 0; i < pluginCount(); ++i) plugin(i)->routes(w);
   w.onNotFound([] { g_server.send(404, "text/plain", "Not found"); });
   w.begin();

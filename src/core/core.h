@@ -40,6 +40,7 @@ struct Settings {
   String source = "photos";    // plugin key the schedule shows
   String host = "frame";       // mDNS name: http://frame.local/
   String pass;                 // admin password for changes; empty = open
+  uint8_t updates = 1;         // 0 off (sends nothing), 1 look daily and tell, 2 also install by itself
 };
 Settings& settings();
 void saveSettings();

@@ -12,11 +12,12 @@
  */
 #include <Arduino.h>
 #include "core/internal.h"
+#include "version.h"
 #include "esp_sleep.h"
 #include "driver/rtc_io.h"
 
 namespace core {
-const char* FW_VERSION = "0.1.0";
+const char* FW_VERSION = FW_VERSION_STR;
 const char* FW_BUILD = __DATE__ " " __TIME__;
 
 static uint32_t g_lastChangeMs = 0;
@@ -113,6 +114,7 @@ void setup() {
 void loop() {
   handleWeb();
   pollButtons();
+  updatesLoop();
 
   if (!refreshing() && nextChangeS() == 0) {
     requestShow("", Step::Next);

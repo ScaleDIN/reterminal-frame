@@ -2,7 +2,7 @@
      Tabs: <section class="tab" data-tab="key" data-title="Title">; the nav is built from them (device.js). -->
 <main>
 <header><div><h1 id="name">Frame</h1><div class="mut" id="sub"></div></div>
-<div class="hright"><span id="pAwake" class="pill" title="How long the frame stays on Wi-Fi before it sleeps">…</span><span id="link" class="pill" title="Wi-Fi">…</span><span id="pBat" class="pill" title="Battery">…</span><span class="pill warn" id="upd" style="display:none;cursor:pointer" onclick="location.reload()" title="The frame runs a different firmware build than this page">New version: reload</span>
+<div class="hright"><span id="pAwake" class="pill" title="How long the frame stays on Wi-Fi before it sleeps">…</span><span id="link" class="pill" title="Wi-Fi">…</span><span id="pBat" class="pill" title="Battery">…</span><span class="pill ok" id="pUpd" style="display:none;cursor:pointer" title="A newer firmware is published: see Setup › Firmware"></span><span class="pill warn" id="upd" style="display:none;cursor:pointer" onclick="location.reload()" title="The frame runs a different firmware build than this page">New version: reload</span>
 <button class="hbtn" id="night" title="Red night mode">🌙</button></div></header>
 
 <nav class="tabs" id="tabs" role="tablist"></nav>
@@ -49,8 +49,16 @@
 <div class="bar" style="margin-top:8px"><button id="sfApply">Save</button></div>
 <p class="msg" id="sfMsg" aria-live="polite"></p></form></details>
 
-<details class="card" id="d-fw"><summary>Firmware update</summary>
-<p class="note" style="margin:0 0 8px">Upload <code>firmware.bin</code> (from <code>pio run</code>: <code>.pio/build/reterminal_e1004/</code>). The frame restarts with it.</p>
+<details class="card" id="d-fw"><summary>Firmware and updates</summary>
+<p style="margin:0 0 6px">Running <b id="fwVer">—</b> <span class="mut" id="fwChecked"></span></p>
+<form class="ctl" id="updForm" onsubmit="return false">
+<label title="Look: once a day while the frame is awake on Wi-Fi it reads the list of published versions (the request carries only the firmware version), and this page says when there is a newer one. Install by itself: also installs it, on USB power or a charged battery. Off: sends nothing.">Online updates <select name="updates"><option value="1">Look daily, tell me</option><option value="2">Install by itself</option><option value="0">Off</option></select></label>
+</form>
+<div class="upd-av" id="updAv"><div class="bar" style="margin:0"><b id="updVer"></b><span class="sp"></span><button type="button" id="updInstall">Install</button></div><pre id="updNotes"></pre></div>
+<div class="bar" style="margin-top:8px"><button type="button" id="updCheck">Check now</button><span class="sp"></span><span class="pill" id="updState" style="visibility:hidden">…</span></div>
+<p class="msg" id="updMsg" aria-live="polite"></p>
+<h3 class="fw-h">Install a file</h3>
+<p class="note" style="margin:0 0 8px">A <code>reterminal-frame-…bin</code> from a release, or <code>.pio/build/reterminal_e1004/firmware.bin</code>. The frame restarts with it.</p>
 <div class="bar"><input type="file" id="fwFile" accept=".bin" style="max-width:none;flex:1"><button id="fwGo" disabled>Upload</button></div>
 <p class="msg" id="fwMsg" aria-live="polite"></p></details>
 

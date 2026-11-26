@@ -24,7 +24,24 @@ S = {
     "battery": 3.92,   # None = no battery (USB only)
     "sd": True,
     "usb": False,
+    "fw": "0.2.0",
+    "upd": {"mode": 1, "state": "idle", "msg": "", "checked": None, "progress": None, "available": None, "t": 0, "job": ""},
 }
+FEED = {"version": "0.3.0", "date": "2026-12-01", "size": 1214000,
+        "notes": "- Dashboards plugin: weather and calendar.\n- Photos: shuffle order."}
+
+
+def upd_tick():
+    u = S["upd"]
+    if u["state"] == "checking" and time.time() - u["t"] > 2:
+        u.update(state="idle", checked=int(time.time()), available=FEED, msg="Version 0.3.0 is available.")
+    elif u["state"] == "downloading":
+        u["progress"] = min(100, int((time.time() - u["t"]) * 12))
+        if u["progress"] >= 100:
+            u.update(state="restarting", msg="Installed 0.3.0. Restarting…", t=time.time())
+    elif u["state"] == "restarting" and time.time() - u["t"] > 3:
+        u.update(state="idle", progress=None, available=None, msg="")
+        S["fw"] = "0.3.0"
 
 
 def names():
@@ -65,7 +82,7 @@ def status():
     last = S["shown"]["at"]
     nxt = max(0, int((last or T0) + s["interval_min"] * 60 - now))
     return {
-        "fw": "0.1.0", "build": "mock", "uptime": int(now - T0), "utc": None, "name": s["host"],
+        "fw": S["fw"], "build": "mock", "uptime": int(now - T0), "utc": None, "name": s["host"],
         "always_on": up, "awake_left": None if up else max(0, int(S["awake_until"] - now)),
         "usb": S["usb"], "charge": ("charging" if bat and bat < 4.15 else "full") if S["usb"] else "not charging",
         "net": dict(S["net"], rssi=-58 if S["net"]["sta"] else None),
@@ -75,12 +92,14 @@ def status():
                   "ago": None if last is None or last > now else int(now - last), "refresh_ms": S["shown"]["refresh_ms"]},
         "refreshing": refreshing(), "next_change": nxt,
         "settings": {k: v for k, v in s.items() if k != "pass"} | {"has_pass": bool(s["pass"])},
+        "upd": {k: v for k, v in S["upd"].items() if k not in ("t", "job")} | {"feed": True},
         "plugins": [{"key": "photos", "title": "Photos", "count": len(n), "cur": S["cur"]}],
     }
 
 
 def get(path, q):
     if path == "/status.json":
+        upd_tick()
         return j(status())
     if path == "/p/photos/list.json":
         thumbs = set(f[:-4] for f in os.listdir(SD) if f.endswith(".jpg")) if S["sd"] else set()
@@ -114,6 +133,8 @@ def post(path, form):
                 s[k] = f[k]
         if "newpass" in f:
             s["pass"] = f["newpass"]
+        if "updates" in f:
+            S["upd"]["mode"] = int(f["updates"])
         return j({"ok": True, "msg": "Saved."})
     if path == "/show":
         if refreshing():
@@ -139,6 +160,16 @@ def post(path, form):
             if os.path.isfile(p):
                 os.remove(p)
         return j({"ok": True})
+    if path == "/updates/check":
+        if S["upd"]["state"] in ("checking", "downloading", "restarting"):
+            return j({"ok": False, "msg": "Already busy."}, 409)
+        S["upd"].update(state="checking", t=time.time(), job="check")
+        return j({"ok": True, "msg": "Looking…"})
+    if path == "/updates/install":
+        if not S["upd"]["available"]:
+            return j({"ok": False, "msg": "No newer version known: check first."}, 409)
+        S["upd"].update(state="downloading", progress=0, t=time.time())
+        return j({"ok": True, "msg": "Downloading…"})
     if path == "/sleep":
         S["awake_until"] = time.time()
         return j({"ok": True})

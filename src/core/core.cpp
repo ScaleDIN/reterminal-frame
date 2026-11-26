@@ -51,6 +51,7 @@ void loadSettings() {
   s.source = p.getString("source", s.source);
   s.host = p.getString("host", s.host);
   s.pass = p.getString("pass", s.pass);
+  s.updates = p.getUChar("upd", s.updates) % 3;
   p.end();
 }
 
@@ -65,6 +66,7 @@ void saveSettings() {
   p.putString("source", s.source);
   p.putString("host", s.host);
   p.putString("pass", s.pass);
+  p.putUChar("upd", s.updates);
   p.end();
 }
 

@@ -36,6 +36,27 @@ panel will).
 
 Offline / bulk conversion: `python tools/convert.py <photos> <SD card>/photos` (same output as the page).
 
+## Updates and releases
+
+The frame updates itself from this repository's GitHub releases, the same scheme as the Alpaca hub:
+
+- While awake on a Wi-Fi network (never on a quick battery wake) it reads `releases.json` from the latest release
+  (`custom_update_repo` in `platformio.ini`), a minute after waking if the last look is a day old, then daily, and
+  on **Check now** (Setup › Firmware and updates). The request carries only the firmware version.
+- **Online updates:** *Look daily, tell me* (default: a header pill and an **Install** button with the notes),
+  *Install by itself* (on USB power or a battery above 3.7 V), or *Off* (sends nothing).
+- Installing streams the file into the spare OTA partition and checks its size and SHA-256 against the list
+  before switching; anything that doesn't match is thrown away and the running firmware stays. HTTPS is checked
+  against the Mozilla root certificates in `certs/x509_crt_bundle.bin`.
+- The repository has to be **public** for frames to read its releases.
+
+To release:
+
+1. Bump `FW_VERSION_STR` in `src/version.h` and add a `## <version> (date)` section to `CHANGES.md`.
+2. `python tools/release.py` builds and writes `dist/release/` (the `.bin`, `releases.json`, `NOTES.md`).
+3. `python tools/release.py --no-build --publish` creates the GitHub release `v<version>` with `gh` (it asks
+   first), or upload the `.bin` and `releases.json` by hand to a release marked *latest*.
+
 ## Layout
 
 | Path | What |
@@ -44,7 +65,9 @@ Offline / bulk conversion: `python tools/convert.py <photos> <SD card>/photos` (
 | `src/core/` | Plugin interface (`plugin.h`), services for plugins (`core.h`), panel + display task, Wi-Fi + web endpoints, power |
 | `src/plugins/<key>/` | One plugin: `<key>.cpp` plus `ui/body.html`, `ui/plugin.js`, `ui/plugin.css` (its tab) |
 | `ui/` | Core page (`body.html`, `device.js`, `device.css`), vendored device-web-ui kit (v16), `mock_data.py` |
-| `tools/` | `build_ui.py`, `convert.py`, `e6_to_png.py`, `embed_ui.py` (vendored) |
+| `src/core/update.cpp`, `src/version.h`, `CHANGES.md` | Online updates, the version, release notes |
+| `certs/` | Root certificates for HTTPS (made with the Arduino core's `gen_crt_bundle.py`) |
+| `tools/` | `build_ui.py`, `release.py`, `convert.py`, `e6_to_png.py`, `embed_ui.py` (vendored) |
 
 ### Writing a plugin
 
